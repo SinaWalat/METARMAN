@@ -8,6 +8,8 @@ gsap.registerPlugin(ScrollTrigger);
 const Contact = () => {
   const [formState, setFormState] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -43,24 +45,47 @@ const Contact = () => {
     );
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formState.name || !formState.email || !formState.message) {
       alert('Please fill in all fields.');
       return;
     }
-    // Simulate submission
-    setSubmitted(true);
-    setFormState({ name: '', email: '', message: '' });
     
-    // Auto clear success message after 5 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-    }, 5000);
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formState),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormState({ name: '', email: '', message: '' });
+        // Auto clear success message after 7 seconds
+        setTimeout(() => {
+          setSubmitted(false);
+        }, 7000);
+      } else {
+        setErrorMsg(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setErrorMsg('Server connection failed. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <section id="contact" ref={containerRef} className="section" style={{ borderBottom: 'none' }}>
+    <section id="contact" ref={containerRef} className="section" style={{ borderBottom: 'none', paddingBottom: '1rem' }}>
       <div className="container">
         
         {/* Section Header */}
@@ -76,11 +101,11 @@ const Contact = () => {
             display: 'grid',
             gridTemplateColumns: '1fr 1.2fr',
             gap: '5rem',
-            marginBottom: '6rem',
+            marginBottom: '2rem',
           }}
         >
           {/* Col 1: Booking Info & Socials */}
-          <div className="contact-col" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+          <div className="contact-col contact-info" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             <div>
               <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', letterSpacing: '0.05em' }}>BOOKINGS & INQUIRIES</h3>
               <p style={{ marginBottom: '1.5rem' }}>
@@ -97,6 +122,7 @@ const Contact = () => {
                   paddingBottom: '0.25rem',
                   width: 'fit-content',
                   display: 'inline-block',
+                  wordBreak: 'break-all',
                 }}
               >
                 booking@metarman.com
@@ -107,7 +133,7 @@ const Contact = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>SOCIAL CHANNELS</span>
               
-              <div style={{ display: 'flex', gap: '1rem' }}>
+              <div className="contact-socials-row" style={{ display: 'flex', gap: '1rem' }}>
                 {/* Instagram card */}
                 <a
                   href="https://www.instagram.com/metarman_?igsh=NTN1cXdiOGhxdmpi&utm_source=qr"
@@ -178,7 +204,7 @@ const Contact = () => {
                     {/* SoundCloud icon */}
                     <svg viewBox="0 0 512 512" width="20" height="20" fill="currentColor">
                       <g>
-                        <path fillRule="evenodd" clipRule="evenodd" d="m214.805 362.56-2.943-54.72 2.943-135.36c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 135.36-2.942 54.72c0 4.769-3.955 8.64-8.828 8.64-4.874 0-8.828-3.871-8.828-8.64zm-35.311 0-2.942-54.72 2.942-100.8c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.943 100.8-2.943 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31 0-2.943-54.72 2.943-112.32c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 112.32-2.942 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31 0-2.942-54.72 2.942-89.28c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.943 89.28-2.943 54.72c0 4.769-3.955 8.64-8.828 8.64-4.874 0-8.828-3.871-8.828-8.64zm-35.311 0-2.943-54.72 2.943-43.2c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 43.2-2.942 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31 0-2.942-54.72 2.942-54.72c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.943 54.72-2.943 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31-23.04L0 307.84l2.943-31.68c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 31.68-2.942 31.68c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm413.371-102.063a71.776 71.776 0 0 1 25.065-4.497c39.002 0 70.621 30.947 70.621 69.12s-31.618 69.12-70.621 69.12H264.836c-9.755 0-17.663-7.762-17.663-17.297V169.6c0-28.8 52.965-28.8 52.965-28.8 58.554 0 107.113 41.851 116.176 96.657z" />
+                        <path fillRule="evenodd" clipRule="evenodd" d="m214.805 362.56-2.943-54.72 2.943-135.36c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 135.36-2.942 54.72c0 4.769-3.955 8.64-8.828 8.64-4.874 0-8.828-3.871-8.828-8.64zm-35.31 0-2.942-54.72 2.942-100.8c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.943 100.8-2.943 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31 0-2.943-54.72 2.943-112.32c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 112.32-2.942 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31 0-2.942-54.72 2.942-89.28c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.943 89.28-2.943 54.72c0 4.769-3.955 8.64-8.828 8.64-4.874 0-8.828-3.871-8.828-8.64zm-35.311 0-2.943-54.72 2.943-43.2c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 43.2-2.942 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31 0-2.942-54.72 2.942-54.72c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.943 54.72-2.943 54.72c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm-35.31-23.04L0 307.84l2.943-31.68c0-4.769 3.955-8.64 8.828-8.64s8.828 3.871 8.828 8.64l2.942 31.68-2.942 31.68c0 4.769-3.955 8.64-8.828 8.64s-8.828-3.871-8.828-8.64zm413.371-102.063a71.776 71.776 0 0 1 25.065-4.497c39.002 0 70.621 30.947 70.621 69.12s-31.618 69.12-70.621 69.12H264.836c-9.755 0-17.663-7.762-17.663-17.297V169.6c0-28.8 52.965-28.8 52.965-28.8 58.554 0 107.113 41.851 116.176 96.657z" />
                       </g>
                     </svg>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -193,7 +219,7 @@ const Contact = () => {
           </div>
 
           {/* Col 2: Interactive Form */}
-          <div className="contact-col">
+          <div className="contact-col contact-form">
             {submitted ? (
               <div
                 style={{
@@ -239,6 +265,7 @@ const Contact = () => {
                   <input
                     type="text"
                     required
+                    disabled={loading}
                     value={formState.name}
                     onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                     className="interactive-element contact-input"
@@ -253,6 +280,7 @@ const Contact = () => {
                       padding: '0.75rem 0',
                       outline: 'none',
                       transition: 'border-color 0.3s ease',
+                      opacity: loading ? 0.5 : 1,
                     }}
                   />
                 </div>
@@ -262,6 +290,7 @@ const Contact = () => {
                   <input
                     type="email"
                     required
+                    disabled={loading}
                     value={formState.email}
                     onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                     className="interactive-element contact-input"
@@ -276,6 +305,7 @@ const Contact = () => {
                       padding: '0.75rem 0',
                       outline: 'none',
                       transition: 'border-color 0.3s ease',
+                      opacity: loading ? 0.5 : 1,
                     }}
                   />
                 </div>
@@ -285,6 +315,7 @@ const Contact = () => {
                   <textarea
                     rows={4}
                     required
+                    disabled={loading}
                     value={formState.message}
                     onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                     className="interactive-element contact-input"
@@ -300,22 +331,31 @@ const Contact = () => {
                       outline: 'none',
                       resize: 'none',
                       transition: 'border-color 0.3s ease',
+                      opacity: loading ? 0.5 : 1,
                     }}
                   />
                 </div>
+
+                {errorMsg && (
+                  <div style={{ color: '#ef4444', fontSize: '0.9rem', fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                    {errorMsg}
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <div>
                   <button
                     type="submit"
+                    disabled={loading}
                     className="btn-minimal interactive-element"
                     style={{
                       padding: '1rem 2.5rem',
                       fontSize: '0.85rem',
-                      cursor: 'pointer',
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      opacity: loading ? 0.6 : 1,
                     }}
                   >
-                    Send Message <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+                    {loading ? 'Sending...' : 'Send Message'} <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
                       <line x1="22" y1="2" x2="11" y2="13" />
                       <polygon points="22 2 15 22 11 13 2 9 22 2" />
                     </svg>
@@ -330,8 +370,8 @@ const Contact = () => {
         <div
           style={{
             borderTop: '1px solid var(--border-color)',
-            paddingTop: '3rem',
-            paddingBottom: '2rem',
+            paddingTop: '1.5rem',
+            paddingBottom: '0',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -371,8 +411,20 @@ const Contact = () => {
         }
         @media (max-width: 900px) {
           .contact-grid {
-            grid-template-columns: 1fr;
-            gap: 3.5rem;
+            grid-template-columns: 1fr !important;
+            gap: 3.5rem !important;
+          }
+          .contact-info {
+            order: 2;
+          }
+          .contact-form {
+            order: 1;
+          }
+        }
+        @media (max-width: 600px) {
+          .contact-socials-row {
+            flex-direction: column !important;
+            gap: 1rem !important;
           }
         }
       `}</style>

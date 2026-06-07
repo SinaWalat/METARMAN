@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 
-const Hero = () => {
+const Hero = ({ isFirstLoad = true }) => {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
@@ -12,7 +12,8 @@ const Hero = () => {
 
 
   useEffect(() => {
-    const tl = gsap.timeline({ delay: 1.8 });
+    const animDelay = isFirstLoad ? 1.8 : 0.2;
+    const tl = gsap.timeline({ delay: animDelay });
 
     // 1. Genre tags fade in one by one
     const tags = subtitleRef.current.querySelectorAll('.genre-tag');
@@ -47,7 +48,7 @@ const Hero = () => {
         ease: 'power2.inOut',
         yoyo: true,
         repeat: 1,
-        delay: 1.8 + tl.duration(),
+        delay: animDelay + tl.duration(),
       }
     );
 

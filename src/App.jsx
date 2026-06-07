@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import BackgroundCanvas from './components/BackgroundCanvas';
@@ -8,6 +8,7 @@ import About from './components/About';
 import Music from './components/Music';
 import Events from './components/Events';
 import Contact from './components/Contact';
+import Gallery from './components/Gallery';
 import './App.css';
 
 // Register GSAP plugin
@@ -15,9 +16,35 @@ gsap.registerPlugin(useGSAP);
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState('home');
   const preloaderRef = useRef(null);
   const cursorDotRef = useRef(null);
   const cursorRingRef = useRef(null);
+  const hasPreloaded = useRef(false);
+  const mainRef = useRef(null);
+
+  // Smooth fade transition between views
+  const navigateTo = useCallback((targetView) => {
+    if (targetView === view) return;
+    if (!mainRef.current) {
+      setView(targetView);
+      return;
+    }
+    gsap.to(mainRef.current, {
+      opacity: 0,
+      duration: 0.3,
+      ease: 'power2.in',
+      onComplete: () => {
+        setView(targetView);
+        window.scrollTo(0, 0);
+        gsap.to(mainRef.current, {
+          opacity: 1,
+          duration: 0.4,
+          ease: 'power2.out',
+        });
+      },
+    });
+  }, [view]);
 
   // Preloader transition timing
   useEffect(() => {
@@ -28,6 +55,7 @@ function App() {
       const tlOutro = gsap.timeline({
         onComplete: () => {
           setLoading(false);
+          hasPreloaded.current = true;
         },
       });
 
@@ -215,13 +243,19 @@ function App() {
           backgroundColor: 'transparent',
         }}
       >
-        <Navbar />
-        <main>
-          <Hero />
-          <About />
-          <Music />
-          <Events />
-          <Contact />
+        <Navbar view={view} setView={navigateTo} />
+        <main ref={mainRef}>
+          {view === 'gallery' ? (
+            <Gallery onBack={() => navigateTo('home')} />
+          ) : (
+            <>
+              <Hero isFirstLoad={!hasPreloaded.current} />
+              <About />
+              <Music />
+              <Events />
+              <Contact />
+            </>
+          )}
         </main>
       </div>
     </>
