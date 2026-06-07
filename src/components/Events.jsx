@@ -6,7 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ALL_SHOWS = [
   {
-    event: 'TREE OF LIFE',
+    event: 'BACK TO NATURE',
     location: 'Datça, Turkey',
     dateDisplay: '25 - 30 JUNE',
     endDate: '2026-06-30',
