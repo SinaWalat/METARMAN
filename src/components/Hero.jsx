@@ -160,7 +160,7 @@ const Hero = ({ isFirstLoad = true }) => {
             gap: '0.75rem',
           }}
         >
-          {['DARKPSY', 'DARK PROGRESSIVE', 'TECHNO', 'MINIMAL TECHNO'].map((genre) => (
+          {['DARKPSY', 'DARK PROGRESSIVE', 'TECHNO', 'MINIMAL TECHNO', 'TECH HOUSE', 'TECHNO DANCE'].map((genre) => (
             <span
               key={genre}
               className="genre-tag"

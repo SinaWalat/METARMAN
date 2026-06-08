@@ -108,6 +108,16 @@ const About = () => {
       bpm: '125 - 128 BPM',
       desc: 'Stripped-back, micro-sonic rhythms, precise mechanical loops, and space-focused design.',
     },
+    {
+      title: 'Tech House',
+      bpm: '124 - 130 BPM',
+      desc: 'Groovy, bassline-driven rhythms blending the structure of techno with the soulful warmth of house.',
+    },
+    {
+      title: 'Techno Dance',
+      bpm: '122 - 128 BPM',
+      desc: 'High-energy beats fusing driving techno foundations with accessible, dancefloor-focused melodies.',
+    },
   ];
 
   return (
@@ -124,7 +134,7 @@ const About = () => {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '3rem', marginBottom: '6rem' }}>
           <div className="about-intro-text" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '850px' }}>
             <p style={{ fontSize: '1.25rem', fontWeight: 400, color: 'var(--text-primary)', lineHeight: 1.6 }}>
-              METARMAN is an electronic DJ from Erbil, Iraq, known for his high-energy performances and powerful fusion of Darkpsy, Dark Progressive, Techno, and Minimal Techno. Active since 2016, he has established himself as one of Iraq’s leading electronic music artists, gaining recognition for his dynamic mixing style and uplifting yet intense sonic journeys.
+              METARMAN is an electronic DJ from Erbil, Iraq, known for his high-energy performances and powerful fusion of Darkpsy, Dark Progressive, Techno, Minimal Techno, Tech House, and Techno Dance. Active since 2016, he has established himself as one of Iraq’s leading electronic music artists, gaining recognition for his dynamic mixing style and uplifting yet intense sonic journeys.
             </p>
             <p>
               Over the years, METARMAN has performed at renowned festivals including Tree of Life Festival (Turkey), Back to Nature, September Ritual, Oceanic Avalanche, and Soulescape, as well as at Club Inferno (Erbil). With releases and recordings featured on This Is Hitech, he continues to push the boundaries of underground electronic music while representing Iraq’s growing international electronic scene.
@@ -192,7 +202,7 @@ const About = () => {
                   METARMAN (Arman) is one of the most recognized names in Iraq's underground electronic music movement. Since beginning his journey behind the decks in 2016, he has built a reputation for delivering electrifying performances that blend technical precision, powerful energy, and deep musical storytelling.
                 </p>
                 <p>
-                  Specializing in Darkpsy, Dark Progressive, Techno, and Minimal Techno, METARMAN crafts immersive sets that take audiences through intense, driving rhythms and uplifting atmospheres. His unique approach combines underground sounds with high-impact performance energy, creating unforgettable dancefloor experiences.
+                  Specializing in Darkpsy, Dark Progressive, Techno, Minimal Techno, Tech House, and Techno Dance, METARMAN crafts immersive sets that take audiences through intense, driving rhythms and uplifting atmospheres. His unique approach combines underground sounds with high-impact performance energy, creating unforgettable dancefloor experiences.
                 </p>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -213,9 +223,9 @@ const About = () => {
           
           <div
             ref={genreGridRef}
+            className="genre-grid-container"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '1px',
               backgroundColor: '#000000',
               border: '1px solid var(--border-color)',
@@ -292,6 +302,22 @@ const About = () => {
         </div>
 
       </div>
+
+      <style>{`
+        .genre-grid-container {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        @media (max-width: 1024px) {
+          .genre-grid-container {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 640px) {
+          .genre-grid-container {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </section>
   );
 };
