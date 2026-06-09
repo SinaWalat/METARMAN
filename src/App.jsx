@@ -9,7 +9,9 @@ import Music from './components/Music';
 import Events from './components/Events';
 import Contact from './components/Contact';
 import Gallery from './components/Gallery';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import './App.css';
+
 
 // Register GSAP plugin
 gsap.registerPlugin(useGSAP);
@@ -258,6 +260,7 @@ function App() {
           )}
         </main>
       </div>
+      <SpeedInsights />
     </>
   );
 }
