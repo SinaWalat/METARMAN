@@ -1,11 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
-const Navbar = ({ view, setView }) => {
+const cleanTitle = (title) => {
+  return title
+    .replace(/Metarman\s*-\s*/gi, '')
+    .replace(/\|\s*This is hitech records.*/gi, '')
+    .replace(/\.wav$/gi, '')
+    .trim()
+    .toUpperCase();
+};
+
+const Navbar = ({ view, setView, trackList = [] }) => {
   const navRef = useRef(null);
   const overlayRef = useRef(null);
   const contentRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const hasLoadedTracks = trackList && trackList.length > 0;
+  const latestTrackTitle = hasLoadedTracks 
+    ? cleanTitle(trackList[0].title) 
+    : 'Ahoora Set & Karma Set';
+  const latestTrackUrl = hasLoadedTracks 
+    ? trackList[0].permalink_url 
+    : 'https://on.soundcloud.com/oqngfxz2pi0UPLVciJ';
+  const latestTrackDesc = hasLoadedTracks 
+    ? (trackList[0].genre || 'Latest Release') 
+    : 'Listen to recent festival recordings.';
 
   useEffect(() => {
     // Entrance animation for header
@@ -267,14 +287,14 @@ const Navbar = ({ view, setView }) => {
           pointerEvents: 'none',
           opacity: 0,
           overflowY: 'auto',
-          alignItems: 'center',
-          justifyContent: 'center'
+          flexDirection: 'column',
+          alignItems: 'center'
         }}
         onClick={() => setMenuOpen(false)}
       >
         {/* Top Header inside overlay */}
         <div className="container" style={{
-          position: 'absolute',
+          position: 'fixed',
           top: 0,
           left: '50%',
           transform: 'translateX(-50%)',
@@ -329,10 +349,10 @@ const Navbar = ({ view, setView }) => {
             gap: '3rem',
             width: '100%',
             maxWidth: '1200px',
-            margin: '0 auto',
+            margin: 'auto',
             padding: '110px 2rem 40px',
-            minHeight: '100vh',
-            alignItems: 'center',
+            minHeight: 'auto',
+            alignItems: 'start',
             zIndex: 5,
             position: 'relative',
             opacity: 0
@@ -344,7 +364,7 @@ const Navbar = ({ view, setView }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            height: '52vh',
+            height: '100%',
             borderRight: '1px solid rgba(255, 255, 255, 0.05)',
             paddingRight: '3rem',
             position: 'relative'
@@ -518,7 +538,7 @@ const Navbar = ({ view, setView }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            height: '52vh',
+            height: '100%',
             borderLeft: '1px solid rgba(255, 255, 255, 0.05)',
             paddingLeft: '3rem'
           }}>
@@ -544,16 +564,24 @@ const Navbar = ({ view, setView }) => {
               </span>
               
               <div>
-                <h4 style={{ fontSize: '0.9rem', color: '#fff', margin: 0, letterSpacing: '0.05em' }}>
-                  Ahoora Set & Karma Set
+                <h4 style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#fff', 
+                  margin: 0, 
+                  letterSpacing: '0.05em',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }} title={latestTrackTitle}>
+                  {latestTrackTitle}
                 </h4>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0 0' }}>
-                  Listen to recent festival recordings.
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0 0', textTransform: 'capitalize' }}>
+                  {latestTrackDesc}
                 </p>
               </div>
 
               <a 
-                href="https://on.soundcloud.com/oqngfxz2pi0UPLVciJ"
+                href={latestTrackUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="interactive-element btn-minimal"
@@ -625,12 +653,8 @@ const Navbar = ({ view, setView }) => {
           }
           @media (max-height: 760px) {
             .menu-content-grid {
-              align-items: start !important;
               padding-top: 90px !important;
               gap: 1.5rem !important;
-            }
-            .nav-col-left, .nav-col-right {
-              height: auto !important;
             }
             .menu-link {
               padding: 0.75rem 1rem !important;

@@ -4,15 +4,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Music = () => {
+const Music = ({ trackList = [] }) => {
   const containerRef = useRef(null);
-  const playlistIframeRef = useRef(null);
   const playerIframeRef = useRef(null);
-  const playlistWidgetRef = useRef(null);
   const playerWidgetRef = useRef(null);
   const controllerWrapperRef = useRef(null);
 
-  const [trackList, setTrackList] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -67,36 +64,7 @@ const Music = () => {
     );
   }, []);
 
-  // Initialize hidden playlist loader
-  useEffect(() => {
-    let timer;
-    const initPlaylistWidget = () => {
-      if (window.SC && playlistIframeRef.current) {
-        try {
-          const widget = window.SC.Widget(playlistIframeRef.current);
-          playlistWidgetRef.current = widget;
 
-          widget.bind(window.SC.Widget.Events.READY, () => {
-            widget.getSounds((sounds) => {
-              if (sounds && sounds.length > 0) {
-                setTrackList(sounds);
-              }
-            });
-          });
-          clearInterval(timer);
-        } catch (err) {
-          console.error("Error initializing playlist loader:", err);
-        }
-      }
-    };
-
-    initPlaylistWidget();
-    timer = setInterval(initPlaylistWidget, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   // Bind player events helper
   const bindPlayerEvents = (widget) => {
@@ -264,18 +232,7 @@ const Music = () => {
           </p>
         </div>
 
-        {/* Hidden SoundCloud Player backend for fetching playlist tracks */}
-        <iframe
-          ref={playlistIframeRef}
-          id="sc-playlist-loader"
-          width="100%"
-          height="166"
-          scrolling="no"
-          frameBorder="no"
-          allow="autoplay"
-          src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/metarman&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"
-          style={{ display: 'none' }}
-        ></iframe>
+
 
         {/* Custom Premium Track List Grid */}
         <div 

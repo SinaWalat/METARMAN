@@ -25,6 +25,37 @@ function App() {
   const cursorRingRef = useRef(null);
   const hasPreloaded = useRef(false);
   const mainRef = useRef(null);
+  const [trackList, setTrackList] = useState([]);
+  const playlistIframeRef = useRef(null);
+
+  // Initialize hidden playlist loader for SoundCloud tracks
+  useEffect(() => {
+    let timer;
+    const initPlaylistWidget = () => {
+      if (window.SC && playlistIframeRef.current) {
+        try {
+          const widget = window.SC.Widget(playlistIframeRef.current);
+          widget.bind(window.SC.Widget.Events.READY, () => {
+            widget.getSounds((sounds) => {
+              if (sounds && sounds.length > 0) {
+                setTrackList(sounds);
+              }
+            });
+          });
+          clearInterval(timer);
+        } catch (err) {
+          console.error("Error initializing playlist loader:", err);
+        }
+      }
+    };
+
+    initPlaylistWidget();
+    timer = setInterval(initPlaylistWidget, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   // Smooth fade transition between views
   const navigateTo = useCallback((targetView) => {
@@ -235,6 +266,19 @@ function App() {
       {/* Background Canvas */}
       <BackgroundCanvas />
 
+      {/* Hidden SoundCloud Player backend for fetching playlist tracks */}
+      <iframe
+        ref={playlistIframeRef}
+        id="sc-playlist-loader"
+        width="100%"
+        height="166"
+        scrolling="no"
+        frameBorder="no"
+        allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/metarman&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"
+        style={{ display: 'none' }}
+      ></iframe>
+
       {/* Main Layout Container */}
       <div
         style={{
@@ -246,7 +290,7 @@ function App() {
           backgroundColor: 'transparent',
         }}
       >
-        <Navbar view={view} setView={navigateTo} />
+        <Navbar view={view} setView={navigateTo} trackList={trackList} />
         <main ref={mainRef}>
           {view === 'gallery' ? (
             <Gallery onBack={() => navigateTo('home')} />
@@ -254,7 +298,7 @@ function App() {
             <>
               <Hero isFirstLoad={!hasPreloaded.current} />
               <About />
-              <Music />
+              <Music trackList={trackList} />
               <Events />
               <Contact />
             </>
